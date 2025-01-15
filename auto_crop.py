@@ -3,18 +3,6 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-# Parameters
-face_model_path = Path('yolo_weights/yolov11l-face.pt')  # Path to face detection weights
-person_model_path = Path('yolo_weights/yolov8n-person.pt')  # Path to person detection weights
-input_directory = Path('../data/nk-dataset')  # Directory with input images
-output_directory = Path('../data/nk-dataset-crops')  # Directory for saving processed images
-desired_size = 1024  # Desired output resolution
-face_padding = 1.15  # Padding around face bounding boxes
-person_padding = 1.1  # Padding around person bounding boxes
-
-# Load models
-face_model = YOLO(face_model_path)
-person_model = YOLO(person_model_path)
 
 def process_image(image_path, model, output_dir, padding, counter):
     # Load image
@@ -97,13 +85,27 @@ def main():
 
     # Iterate through images in the input directory
     counter = 0
-    for image_path in input_directory.iterdir():
-        if image_path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.heic'}:
-            # Process image for face detection
-            counter = process_image(image_path, face_model, output_directory, face_padding, counter)
+    for image_path in input_directory.glob('*.{png,jpg,jpeg,heic}'):
+        # Process image for face detection
+        counter = process_image(image_path, face_model, output_directory, face_padding, counter)
 
-            # Process image for person detection
-            counter = process_image(image_path, person_model, output_directory, person_padding, counter)
+        # Process image for person detection
+        counter = process_image(image_path, person_model, output_directory, person_padding, counter)
 
 if __name__ == '__main__':
+    # Parameters
+    input_directory = Path('../data/nk-dataset')  # Directory with input images
+    output_directory = Path('../data/nk-dataset-crops')  # Directory for saving processed images
+    desired_size = 1024  # Desired output resolution
+    face_padding = 1.15  # Padding around face bounding boxes
+    person_padding = 1.1  # Padding around person bounding boxes
+
+    # Yolo paths
+    face_model_path = Path('yolo_weights/yolov11l-face.pt')  # Path to face detection weights
+    person_model_path = Path('yolo_weights/yolov8n-person.pt')  # Path to person detection weights
+
+    # Load models
+    face_model = YOLO(face_model_path)
+    person_model = YOLO(person_model_path)
+
     main()
