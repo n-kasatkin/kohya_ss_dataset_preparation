@@ -3,18 +3,24 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
+counter = 0
 
-def process_image(image_path, model, output_dir, padding, counter):
+def process_image(image_path, model, output_dir, padding):
+    global counter
+
     # Load image
     image = cv2.imread(str(image_path))
     image_height, image_width = image.shape[:2]
 
     # Perform object detection
-    results = model(image)
+    cls_dict = model.names
+    results = model(image, **yolo_params, classes=[0])
 
     for result in results:
         # Extract bounding boxes
         for box in result.boxes:
+            klass_name = cls_dict[box.cls.item()]
+
             # Convert tensor coordinates to integers
             x1, y1, x2, y2 = box.xyxy[0].tolist()
             box_width = x2 - x1
@@ -73,37 +79,39 @@ def process_image(image_path, model, output_dir, padding, counter):
 
             # Save the resized image
             ext = image_path.suffix  # Get the original file extension
-            output_path = output_dir / f"{counter}{ext}"
+            output_path = output_dir / f"{counter}_{klass_name}{ext}"
             cv2.imwrite(str(output_path), resized_img)
             counter += 1
-
-    return counter
 
 def main():
     # Create output directories if they don't exist
     output_directory.mkdir(parents=True, exist_ok=True)
 
     # Iterate through images in the input directory
-    counter = 0
     for image_path in input_directory.glob('*'):
         if image_path.suffix.lower() in {'.png', '.jpg', '.jpeg'}:
             # Process image for face detection
-            counter = process_image(image_path, face_model, output_directory, face_padding, counter)
+            process_image(image_path, face_model, output_directory, face_padding)
 
             # Process image for person detection
-            counter = process_image(image_path, person_model, output_directory, person_padding, counter)
+            process_image(image_path, person_model, output_directory, person_padding)
 
 if __name__ == '__main__':
     # Parameters
-    input_directory = Path('/Users/court/Desktop/nk-dataset-raw')  # Directory with input images
-    output_directory = Path('/Users/court/Desktop/nk-dataset')  # Directory for saving processed images
+    input_directory = Path('/Users/court/Desktop/nk-dataset-hq-subset')  # Directory with input images
+    output_directory = Path('/Users/court/Desktop/nk-dataset-hq-2')  # Directory for saving processed images
     desired_size = 1024  # Desired output resolution
-    face_padding = 1.15  # Padding around face bounding boxes
-    person_padding = 1.1  # Padding around person bounding boxes
+    face_padding = 1.1  # Padding around face bounding boxes
+    person_padding = 1  # Padding around person bounding boxes
+
+    yolo_params = {
+        "conf": 0.75,
+        "iou": 0.9,
+    }
 
     # Yolo paths
     face_model_path = Path('yolo_weights/yolov11l-face.pt')  # Path to face detection weights
-    person_model_path = Path('yolo_weights/yolov8n-person.pt')  # Path to person detection weights
+    person_model_path = Path('yolo_weights/yolo11l.pt')  # Path to person detection weights
 
     # Load models
     face_model = YOLO(face_model_path)
