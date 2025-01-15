@@ -3,4 +3,4 @@ uv run batch-alpha2.py \
     --num-workers=16 \
     --print-captioning-status \
     --overwrite \
-    --prepend-string "ohwx man"
+    --prepend-string "ohwx man, "
