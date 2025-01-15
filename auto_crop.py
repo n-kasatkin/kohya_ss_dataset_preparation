@@ -98,7 +98,7 @@ def main():
     # Iterate through images in the input directory
     counter = 0
     for image_path in input_directory.iterdir():
-        if image_path.suffix.lower() in {'.png', '.jpg', '.jpeg'}:
+        if image_path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.heic'}:
             # Process image for face detection
             counter = process_image(image_path, face_model, output_directory, face_padding, counter)
 
