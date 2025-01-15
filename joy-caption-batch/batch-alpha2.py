@@ -477,11 +477,11 @@ def write_caption(image_path: Path, caption: str, args):
         content = caption
 
     # Apply PREPEND_STRING and APPEND_STRING
-    caption = f"{args.prepend_string}{caption}{args.append_string}"
+    content = f"{args.prepend_string}{caption}{args.append_string}"
 
     # If PRINT_CAPTIONS is True, print the caption to console
     if args.print_captions:
-        print(f"Caption for '{image_path}': {caption}")
+        print(f"Caption for '{image_path}': {content}")
 
     # Handle OVERWRITE option
     if caption_path.exists():
