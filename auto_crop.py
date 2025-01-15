@@ -85,17 +85,18 @@ def main():
 
     # Iterate through images in the input directory
     counter = 0
-    for image_path in input_directory.glob('*.{png,jpg,jpeg,heic}'):
-        # Process image for face detection
-        counter = process_image(image_path, face_model, output_directory, face_padding, counter)
+    for image_path in input_directory.glob('*'):
+        if image_path.suffix.lower() in {'.png', '.jpg', '.jpeg'}:
+            # Process image for face detection
+            counter = process_image(image_path, face_model, output_directory, face_padding, counter)
 
-        # Process image for person detection
-        counter = process_image(image_path, person_model, output_directory, person_padding, counter)
+            # Process image for person detection
+            counter = process_image(image_path, person_model, output_directory, person_padding, counter)
 
 if __name__ == '__main__':
     # Parameters
-    input_directory = Path('../data/nk-dataset')  # Directory with input images
-    output_directory = Path('../data/nk-dataset-crops')  # Directory for saving processed images
+    input_directory = Path('/Users/court/Desktop/nk-dataset-raw')  # Directory with input images
+    output_directory = Path('/Users/court/Desktop/nk-dataset')  # Directory for saving processed images
     desired_size = 1024  # Desired output resolution
     face_padding = 1.15  # Padding around face bounding boxes
     person_padding = 1.1  # Padding around person bounding boxes
